@@ -3,6 +3,7 @@
 namespace SESP;
 
 use MediaWiki\MediaWikiServices;
+use SMW\PropertyRegistry as Registry;
 use SMW\Services\ServicesFactory;
 
 /**
@@ -62,8 +63,7 @@ class HookRegistry {
 	 * @return bool
 	 */
 	public function isRegistered( $name ) {
-		$hookContainer = MediaWikiServices::getInstance()->getHookContainer();
-		return $hookContainer->isRegistered( $name );
+		return MediaWikiServices::getInstance()->getHookContainer()->isRegistered( $name );
 	}
 
 	/**
@@ -74,8 +74,10 @@ class HookRegistry {
 	 * @return array
 	 */
 	public function getHandlers( $name ) {
-		$hookContainer = MediaWikiServices::getInstance()->getHookContainer();
-		return $hookContainer->getHandlers( $name );
+		$container = MediaWikiServices::getInstance()->getHookContainer();
+		return method_exists( $container, 'getHandlerCallbacks' )
+			? $container->getHandlerCallbacks( $name )
+			: $container->getHandlers( $name );
 	}
 
 	/**
@@ -143,13 +145,11 @@ class HookRegistry {
 		/**
 		 * @see https://www.semantic-mediawiki.org/wiki/Hooks/SMW::Property::initProperties
 		 */
-		$this->handlers['SMW::Property::initProperties'] = static function ( $registry ) use ( $propertyRegistry ) {
-			$propertyRegistry->register(
-				$registry
-			);
-
-			return true;
-		};
+		$this->handlers['SMW::Property::initProperties']
+			= static function ( Registry $registry ) use ( $propertyRegistry ) {
+				$propertyRegistry->register( $registry );
+				return true;
+			};
 
 		/**
 		 * @see https://www.semantic-mediawiki.org/wiki/Hooks/SMW::SQLStore::AddCustomFixedPropertyTables
