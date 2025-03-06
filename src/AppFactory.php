@@ -72,7 +72,11 @@ class AppFactory implements LoggerAwareInterface {
 	 */
 	public function getConnection() {
 		if ( $this->connection === null ) {
-			$this->connection = wfGetDB( DB_REPLICA );
+			if ( version_compare( MW_VERSION, '1.42', '>=' ) ) {
+				$this->connection = MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase();
+			} else {
+				$this->connection = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_REPLICA );
+			}
 		}
 
 		return $this->connection;
@@ -168,13 +172,8 @@ class AppFactory implements LoggerAwareInterface {
 			);
 		}
 
-		// Pre 1.36
 		$services = MediaWikiServices::getInstance();
-		if ( !method_exists( $services, 'getWikiPageFactory' ) ) {
-			return WikiPage::factory( $title );
-		} else {
-			return $services->getWikiPageFactory()->newFromTitle( $title );
-		}
+		return $services->getWikiPageFactory()->newFromTitle( $title );
 	}
 
 	/**
