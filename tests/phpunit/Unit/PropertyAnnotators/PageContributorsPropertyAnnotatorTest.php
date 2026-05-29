@@ -4,12 +4,12 @@ namespace SESP\Tests\PropertyAnnotators;
 
 use ArrayIterator;
 use MediaWiki\Permissions\PermissionManager;
+use MediaWiki\User\User;
 use SESP\AppFactory;
 use SESP\PropertyAnnotators\PageContributorsPropertyAnnotator;
-use SMW\DIProperty;
-use SMW\DIWikiPage;
-use SMW\SemanticData;
-use User;
+use SMW\DataItems\Property;
+use SMW\DataItems\WikiPage as DIWikiPage;
+use SMW\DataModel\SemanticData;
 use WikiPage;
 
 /**
@@ -33,7 +33,7 @@ class PageContributorsPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase 
 			->disableOriginalConstructor()
 			->getMock();
 
-		$this->property = new DIProperty( '___EUSER' );
+		$this->property = new Property( '___EUSER' );
 	}
 
 	public function testCanConstruct() {

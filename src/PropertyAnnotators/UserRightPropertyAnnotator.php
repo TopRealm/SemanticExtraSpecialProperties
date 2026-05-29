@@ -4,12 +4,12 @@ namespace SESP\PropertyAnnotators;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Permissions\PermissionManager;
+use MediaWiki\User\User;
 use SESP\AppFactory;
 use SESP\PropertyAnnotator;
-use SMW\DIProperty;
-use SMW\SemanticData;
-use SMWDIBlob as DIBlob;
-use User;
+use SMW\DataItems\Blob;
+use SMW\DataItems\Property;
+use SMW\DataModel\SemanticData;
 
 /**
  * @private
@@ -52,7 +52,7 @@ class UserRightPropertyAnnotator implements PropertyAnnotator {
 	 *
 	 * {@inheritDoc}
 	 */
-	public function isAnnotatorFor( DIProperty $property ) {
+	public function isAnnotatorFor( Property $property ) {
 		return $property->getKey() === self::PROP_ID;
 	}
 
@@ -61,7 +61,7 @@ class UserRightPropertyAnnotator implements PropertyAnnotator {
 	 *
 	 * {@inheritDoc}
 	 */
-	public function addAnnotation( DIProperty $property, SemanticData $semanticData ) {
+	public function addAnnotation( Property $property, SemanticData $semanticData ) {
 		$title = $semanticData->getSubject()->getTitle();
 
 		if ( !$title->inNamespace( NS_USER ) ) {
@@ -77,7 +77,7 @@ class UserRightPropertyAnnotator implements PropertyAnnotator {
 		}
 
 		foreach ( $this->permissionManager->getUserPermissions( $user ) as $right ) {
-			$semanticData->addPropertyObjectValue( $property, new DIBlob( $right ) );
+			$semanticData->addPropertyObjectValue( $property, new Blob( $right ) );
 		}
 	}
 
