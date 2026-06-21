@@ -5,10 +5,10 @@ namespace SESP;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use Onoi\Cache\Cache;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Wikimedia\ObjectCache\BagOStuff;
 use Wikimedia\Rdbms\Database;
 use WikiPage;
 
@@ -28,7 +28,7 @@ class AppFactory implements LoggerAwareInterface {
 	private $options;
 
 	/**
-	 * @var Cache
+	 * @var BagOStuff
 	 */
 	private $cache;
 
@@ -51,9 +51,9 @@ class AppFactory implements LoggerAwareInterface {
 	 * @since 2.0
 	 *
 	 * @param array $options
-	 * @param Cache|null $cache
+	 * @param BagOStuff|null $cache
 	 */
-	public function __construct( array $options = [], ?Cache $cache = null ) {
+	public function __construct( array $options = [], ?BagOStuff $cache = null ) {
 		$this->options = $options;
 		$this->cache = $cache;
 	}
@@ -170,6 +170,27 @@ class AppFactory implements LoggerAwareInterface {
 
 		$services = MediaWikiServices::getInstance();
 		return $services->getWikiPageFactory()->newFromTitle( $title );
+	}
+
+	/**
+	 * Reads a single page property as persisted in the `page_props` table (for
+	 * example the `description` set by the Description2 extension).
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param Title $title
+	 * @param string $name
+	 *
+	 * @return string|null the property value, or null when it is not set
+	 */
+	public function getPageProperty( Title $title, string $name ): ?string {
+		$properties = MediaWikiServices::getInstance()->getPageProps()->getProperties( $title, $name );
+
+		if ( $properties === [] ) {
+			return null;
+		}
+
+		return (string)reset( $properties );
 	}
 
 	/**
