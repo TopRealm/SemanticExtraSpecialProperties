@@ -1,5 +1,12 @@
 This file contains the RELEASE-NOTES of the **Semantic Extra Special Properties** (a.k.a. SESP) extension.
 
+### 5.0.1
+
+Released on July 23, 2026.
+
+* Fixed a fatal error that aborted a page's entire Semantic MediaWiki data update when an EXIF or XMP date property held a multi-valued value, such as an XMP `dc:date` Dublin Core sequence; such values are now handled (#226).
+* Localization updates from https://translatewiki.net
+
 ### 5.0.0
 
 Released on June 8, 2026.
