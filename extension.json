@@ -1,6 +1,6 @@
 {
 	"name": "SemanticExtraSpecialProperties",
-	"version": "5.0.1",
+	"version": "5.0.2",
 	"author": [
 		"Leo Wallentin",
         "James Hong Kong",
@@ -25,6 +25,10 @@
 	},
 	"AutoloadNamespaces": {
 		"SESP\\": "src/"
+	},
+	"TestAutoloadNamespaces": {
+		"SESP\\Tests\\": "tests/phpunit/Unit/",
+		"SESP\\Tests\\Integration\\": "tests/phpunit/Integration/"
 	},
 	"ConfigRegistry": {
 		"sespg": "SESP\\Config::newInstance"

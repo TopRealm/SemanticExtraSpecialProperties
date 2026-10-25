@@ -85,7 +85,7 @@ class AppFactory implements LoggerAwareInterface {
 	 *
 	 * @param LoggerInterface $logger
 	 */
-	public function setLogger( LoggerInterface $logger ) {
+	public function setLogger( LoggerInterface $logger ): void {
 		$this->logger = $logger;
 	}
 
@@ -157,17 +157,6 @@ class AppFactory implements LoggerAwareInterface {
 	 * @return WikiPage
 	 */
 	public function newWikiPage( Title $title ) {
-		// #55
-		// Fight a possible DB corruption and avoid "NS_MEDIA is a virtual namespace; use NS_FILE"
-		if ( $title->getNamespace() === NS_MEDIA ) {
-			$title = Title::makeTitleSafe(
-				NS_FILE,
-				$title->getDBkey(),
-				$title->getInterwiki(),
-				$title->getFragment()
-			);
-		}
-
 		$services = MediaWikiServices::getInstance();
 		return $services->getWikiPageFactory()->newFromTitle( $title );
 	}
