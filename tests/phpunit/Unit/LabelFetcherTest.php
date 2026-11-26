@@ -3,6 +3,8 @@
 namespace SESP\Tests;
 
 use SESP\LabelFetcher;
+use SESP\PropertyDefinitions;
+use Wikimedia\ObjectCache\BagOStuff;
 
 /**
  * @covers \SESP\LabelFetcher
@@ -20,7 +22,7 @@ class LabelFetcherTest extends \PHPUnit\Framework\TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->cache = $this->getMockBuilder( '\Onoi\Cache\Cache' )
+		$this->cache = $this->getMockBuilder( BagOStuff::class )
 			->disableOriginalConstructor()
 			->getMock();
 	}
@@ -50,7 +52,7 @@ class LabelFetcherTest extends \PHPUnit\Framework\TestCase {
 			]
 		];
 
-		$propertyDefinitions = $this->getMockBuilder( '\SESP\PropertyDefinitions' )
+		$propertyDefinitions = $this->getMockBuilder( PropertyDefinitions::class )
 			->disableOriginalConstructor()
 			->addMethods( [] )
 			->getMock();
@@ -60,11 +62,11 @@ class LabelFetcherTest extends \PHPUnit\Framework\TestCase {
 		);
 
 		$this->cache->expects( $this->once() )
-			->method( 'fetch' )
+			->method( 'get' )
 			->willReturn( false );
 
 		$this->cache->expects( $this->once() )
-			->method( 'save' );
+			->method( 'set' );
 
 		$instance = new LabelFetcher(
 			$this->cache
@@ -80,17 +82,17 @@ class LabelFetcherTest extends \PHPUnit\Framework\TestCase {
 			'FOO' => 'Bar'
 		];
 
-		$propertyDefinitions = $this->getMockBuilder( '\SESP\PropertyDefinitions' )
+		$propertyDefinitions = $this->getMockBuilder( PropertyDefinitions::class )
 			->disableOriginalConstructor()
 			->onlyMethods( [ 'getLabels' ] )
 			->getMock();
 
 		$this->cache->expects( $this->once() )
-			->method( 'fetch' )
+			->method( 'get' )
 			->willReturn( $labels );
 
 		$this->cache->expects( $this->never() )
-			->method( 'save' );
+			->method( 'set' );
 
 		$instance = new LabelFetcher(
 			$this->cache
@@ -104,13 +106,13 @@ class LabelFetcherTest extends \PHPUnit\Framework\TestCase {
 			'FOO' => 'Bar'
 		];
 
-		$propertyDefinitions = $this->getMockBuilder( '\SESP\PropertyDefinitions' )
+		$propertyDefinitions = $this->getMockBuilder( PropertyDefinitions::class )
 			->disableOriginalConstructor()
 			->onlyMethods( [] )
 			->getMock();
 
 		$this->cache->expects( $this->once() )
-			->method( 'fetch' )
+			->method( 'get' )
 			->with( $this->stringContains( 'sesp:labels:e1484da79bc6323bcb087894cf9cab03' ) )
 			->willReturn( $labels );
 

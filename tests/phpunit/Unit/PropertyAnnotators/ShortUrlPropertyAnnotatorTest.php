@@ -2,9 +2,11 @@
 
 namespace SESP\Tests\PropertyAnnotators;
 
+use SESP\AppFactory;
 use SESP\PropertyAnnotators\ShortUrlPropertyAnnotator;
-use SMW\DIProperty;
-use SMW\DIWikiPage;
+use SMW\DataItems\Property;
+use SMW\DataItems\WikiPage;
+use SMW\DataModel\SemanticData;
 
 /**
  * @covers \SESP\PropertyAnnotators\ShortUrlPropertyAnnotator
@@ -23,11 +25,11 @@ class ShortUrlPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->appFactory = $this->getMockBuilder( '\SESP\AppFactory' )
+		$this->appFactory = $this->getMockBuilder( AppFactory::class )
 			->disableOriginalConstructor()
 			->getMock();
 
-		$this->property = new DIProperty( '___SHORTURL' );
+		$this->property = new Property( '___SHORTURL' );
 	}
 
 	public function testCanConstruct() {
@@ -47,6 +49,47 @@ class ShortUrlPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 		);
 	}
 
+	public function testUrlPrefixDefaultsToTheShortUrlSpecialPage() {
+		$this->appFactory->method( 'getOption' )
+			->with( 'wgShortUrlPrefix', '' )
+			->willReturn( '' );
+
+		// The ShortUrl extension defines the alias of its special page and is not installed in the test
+		// environment, so MediaWiki would raise a development warning about the missing alias. That is
+		// unrelated to what is tested here, so only this call runs without development warnings.
+		global $wgDevelopmentWarnings;
+		$developmentWarnings = $wgDevelopmentWarnings;
+		$wgDevelopmentWarnings = false;
+
+		try {
+			$prefix = $this->newInstanceExposingUrlPrefix()->urlPrefix();
+		} finally {
+			$wgDevelopmentWarnings = $developmentWarnings;
+		}
+
+		$this->assertStringContainsString( 'ShortUrl', $prefix );
+		$this->assertStringEndsWith( '/', $prefix );
+	}
+
+	public function testConfiguredUrlPrefixIsUsedAsIs() {
+		$this->appFactory->method( 'getOption' )
+			->with( 'wgShortUrlPrefix', '' )
+			->willReturn( 'https://example.org/s/' );
+
+		$this->assertSame(
+			'https://example.org/s/',
+			$this->newInstanceExposingUrlPrefix()->urlPrefix()
+		);
+	}
+
+	private function newInstanceExposingUrlPrefix(): ShortUrlPropertyAnnotator {
+		return new class( $this->appFactory ) extends ShortUrlPropertyAnnotator {
+			public function urlPrefix() {
+				return $this->getUrlPrefix();
+			}
+		};
+	}
+
 	public function testMissingShortUrlUtilsThrowsException() {
 		// PHPUnit 6.5+
 		if ( is_callable( [ $this, 'expectException' ] ) ) {
@@ -55,7 +98,7 @@ class ShortUrlPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			$this->setExpectedException( '\RuntimeException' );
 		}
 
-		$semanticData = $this->getMockBuilder( '\SMW\SemanticData' )
+		$semanticData = $this->getMockBuilder( SemanticData::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -72,9 +115,9 @@ class ShortUrlPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 	}
 
 	public function testAddAnnotation() {
-		$subject = DIWikiPage::newFromText( __METHOD__ );
+		$subject = WikiPage::newFromText( __METHOD__ );
 
-		$semanticData = $this->getMockBuilder( '\SMW\SemanticData' )
+		$semanticData = $this->getMockBuilder( SemanticData::class )
 			->disableOriginalConstructor()
 			->getMock();
 

@@ -4,8 +4,8 @@ namespace SESP;
 
 use SESP\PropertyAnnotators\DispatchingPropertyAnnotator;
 use SESP\PropertyAnnotators\LocalPropertyAnnotator;
-use SMW\DIProperty;
-use SMW\SemanticData;
+use SMW\DataItems\Property;
+use SMW\DataModel\SemanticData;
 
 /**
  * @private
@@ -61,7 +61,7 @@ class ExtraPropertyAnnotator {
 				continue;
 			}
 
-			$property = new DIProperty(
+			$property = new Property(
 				$propertyDefinitions->deepGet( $key, 'id' )
 			);
 
@@ -92,7 +92,9 @@ class ExtraPropertyAnnotator {
 	}
 
 	private function canAnnotate( $subject ) {
-		if ( $subject === null || $subject->getTitle() === null || $subject->getTitle()->isSpecialPage() ) {
+		$title = $subject === null ? null : $subject->getTitle();
+
+		if ( $title === null || !$title->canExist() ) {
 			return false;
 		}
 

@@ -1,0 +1,17 @@
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "composer"
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "daily"
+    ignore:
+      # 52.x requires PHP 8.3, but the minimum supported PHP version is 8.2
+      - dependency-name: "mediawiki/mediawiki-codesniffer"
+        versions: [ ">=52" ]
+
+  - package-ecosystem: "github-actions"
+    directory: "/" # Dependabot scans .github/workflows from the root
+    schedule:
+      interval: "weekly"

@@ -3,8 +3,13 @@
 namespace SESP\Tests\PropertyAnnotators;
 
 use MediaWiki\Permissions\PermissionManager;
+use MediaWiki\Title\Title;
+use MediaWiki\User\User;
+use SESP\AppFactory;
 use SESP\PropertyAnnotators\UserRightPropertyAnnotator;
-use SMW\DIProperty;
+use SMW\DataItems\Property;
+use SMW\DataItems\WikiPage;
+use SMW\DataModel\SemanticData;
 
 /**
  * @covers \SESP\PropertyAnnotators\UserRightPropertyAnnotator
@@ -23,11 +28,11 @@ class UserRightPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->appFactory = $this->getMockBuilder( '\SESP\AppFactory' )
+		$this->appFactory = $this->getMockBuilder( AppFactory::class )
 			->disableOriginalConstructor()
 			->getMock();
 
-		$this->property = new DIProperty( '___USERRIGHT' );
+		$this->property = new Property( '___USERRIGHT' );
 	}
 
 	public function testCanConstruct() {
@@ -51,7 +56,7 @@ class UserRightPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 	 * @dataProvider rightsProvider
 	 */
 	public function testAddAnnotation( $rights, $expected ) {
-		$user = $this->getMockBuilder( '\User' )
+		$user = $this->getMockBuilder( User::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -59,7 +64,7 @@ class UserRightPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			->method( 'newUserFromTitle' )
 			->willReturn( $user );
 
-		$title = $this->getMockBuilder( '\Title' )
+		$title = $this->getMockBuilder( Title::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -67,7 +72,7 @@ class UserRightPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			->method( 'inNamespace' )
 			->willReturn( true );
 
-		$subject = $this->getMockBuilder( '\SMW\DIWikiPage' )
+		$subject = $this->getMockBuilder( WikiPage::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -75,7 +80,7 @@ class UserRightPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			->method( 'getTitle' )
 			->willReturn( $title );
 
-		$semanticData = $this->getMockBuilder( '\SMW\SemanticData' )
+		$semanticData = $this->getMockBuilder( SemanticData::class )
 			->disableOriginalConstructor()
 			->getMock();
 

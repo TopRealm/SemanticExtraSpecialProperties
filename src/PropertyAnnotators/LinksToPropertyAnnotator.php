@@ -3,12 +3,12 @@
 namespace SESP\PropertyAnnotators;
 
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Title\Title;
 use SESP\AppFactory;
 use SESP\PropertyAnnotator;
-use SMW\DIProperty;
-use SMW\DIWikiPage;
-use SMW\SemanticData;
-use Title;
+use SMW\DataItems\Property;
+use SMW\DataItems\WikiPage;
+use SMW\DataModel\SemanticData;
 
 /**
  * @private
@@ -52,7 +52,7 @@ class LinksToPropertyAnnotator implements PropertyAnnotator {
 	 *
 	 * {@inheritDoc}
 	 */
-	public function isAnnotatorFor( DIProperty $property ) {
+	public function isAnnotatorFor( Property $property ) {
 		return $property->getKey() === self::PROP_ID;
 	}
 
@@ -61,7 +61,7 @@ class LinksToPropertyAnnotator implements PropertyAnnotator {
 	 *
 	 * {@inheritDoc}
 	 */
-	public function addAnnotation( DIProperty $property, SemanticData $semanticData ) {
+	public function addAnnotation( Property $property, SemanticData $semanticData ) {
 		$page = $semanticData->getSubject()->getTitle();
 
 		if (
@@ -78,16 +78,15 @@ class LinksToPropertyAnnotator implements PropertyAnnotator {
 			return;
 		}
 
-		$where = sprintf(
-			'pl.pl_from = %s AND pl.pl_title != %s',
-			$page->getArticleID(),
-			$con->addQuotes( $page->getDBkey() )
-		);
+		$where = [];
+		$where[] = sprintf( 'pl.pl_from = %s', $page->getArticleID() );
+		$where[] = sprintf( 'pl.pl_title != %s', $con->addQuotes( $page->getDBkey() ) );
+		$where[] = sprintf( 'pl.pl_namespace IN (%s)', implode( ',', $this->enabledNamespaces ) );
 
 		$res = $con->select(
 			[ 'pl' => 'pagelinks', 'page' ],
 			[ 'sel_title' => 'pl.pl_title', 'sel_ns' => 'pl.pl_namespace' ],
-			[ $where ],
+			$where,
 			__METHOD__,
 			[ 'DISTINCT' ],
 			[ 'page' => [ 'JOIN', 'page_id=pl_from' ] ]
@@ -96,7 +95,7 @@ class LinksToPropertyAnnotator implements PropertyAnnotator {
 		foreach ( $res as $row ) {
 			$title = Title::newFromText( $row->sel_title, $row->sel_ns );
 			if ( $title !== null && $title->exists() ) {
-				$semanticData->addPropertyObjectValue( $property, DIWikiPage::newFromTitle( $title ) );
+				$semanticData->addPropertyObjectValue( $property, WikiPage::newFromTitle( $title ) );
 			}
 		}
 	}

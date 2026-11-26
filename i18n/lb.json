@@ -7,7 +7,7 @@
 	},
 	"sesp-property-unknown-label": "Etikett oder Alias onbekannt",
 	"sesp-property-author": "Auteur vun der Säit",
-	"sesp-property-revision-id": "Versioun ID",
+	"sesp-property-revision-id": "Versiouns-ID",
 	"sesp-property-page-id": "ID (Nummer) vun der Säit",
 	"sesp-property-page-len": "Längt vun der Säit",
 	"sesp-property-page-img": "Säitebild",
@@ -26,6 +26,10 @@
 	"sesp-property-user-group": "Benotzergrupp",
 	"sesp-property-exif-data": "Exif-Donnéeën",
 	"sesp-exif-languagecode": "Exif:Sproochecode",
+	"sesp-exif-gpslatitude": "Exif:Breedegrad",
+	"sesp-exif-gpslongitude": "Exif:Längegrad",
+	"sesp-exif-gpsaltitude": "Exif:Héicht",
 	"sesp-exif-label": "Exif:Etikett",
-	"sesp-exif-iimcategory": "Exif:IIM-Kategorie"
+	"sesp-exif-iimcategory": "Exif:IIM-Kategorie",
+	"sesp-property-group-label-exif-gps-group": "Exif (Standuert, GPS)"
 }

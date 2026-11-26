@@ -2,12 +2,12 @@
 
 namespace SESP\PropertyAnnotators;
 
-use MWTimestamp;
+use MediaWiki\Utils\MWTimestamp;
 use SESP\AppFactory;
 use SESP\PropertyAnnotator;
-use SMW\DIProperty;
-use SMW\SemanticData;
-use SMWDITime as DITime;
+use SMW\DataItems\Property;
+use SMW\DataItems\Time;
+use SMW\DataModel\SemanticData;
 
 /**
  * @private
@@ -28,7 +28,7 @@ class ApprovedDatePropertyAnnotator implements PropertyAnnotator {
 	private $appFactory;
 
 	/**
-	 * @var int|null
+	 * @var MWTimestamp|false|null
 	 */
 	private $approvedDate;
 
@@ -42,7 +42,7 @@ class ApprovedDatePropertyAnnotator implements PropertyAnnotator {
 	/**
 	 * @since 2.0
 	 *
-	 * @param int $approvedDate
+	 * @param MWTimestamp|false|null $approvedDate
 	 */
 	public function setApprovedDate( $approvedDate ) {
 		$this->approvedDate = $approvedDate;
@@ -51,20 +51,30 @@ class ApprovedDatePropertyAnnotator implements PropertyAnnotator {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isAnnotatorFor( DIProperty $property ) {
+	public function isAnnotatorFor( Property $property ) {
 		return $property->getKey() === self::PROP_ID;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function addAnnotation( DIProperty $property, SemanticData $semanticData ) {
+	public function addAnnotation( Property $property, SemanticData $semanticData ) {
 		if ( $this->approvedDate === null && class_exists( 'ApprovedRevs' ) ) {
 			// ApprovedRevs does not provide a function to get the approval date,
 			// so fetch it here from the ApprovedRevs table
 			$pageID = $semanticData->getSubject()->getTitle()->getArticleID();
-			$dbr = wfGetDB( DB_REPLICA );
-			$approval_date = $dbr->selectField( 'approved_revs', 'approval_date', [ 'page_id' => $pageID ] );
+			$dbr = $this->appFactory->getConnection();
+			if ( $dbr ) {
+				$approval_date = $dbr->selectField(
+					'approved_revs',
+					'approval_date',
+					[ 'page_id' => $pageID ],
+					__METHOD__
+				);
+			} else {
+				// Handle the error appropriately, e.g., log an error or throw an exception
+				throw new \RuntimeException( 'Database connection failed.' );
+			}
 
 			if ( $approval_date ) {
 				$this->approvedDate = new MWTimestamp( wfTimestamp( TS_MW, $approval_date ) );
@@ -82,8 +92,8 @@ class ApprovedDatePropertyAnnotator implements PropertyAnnotator {
 	private function getDataItem() {
 		if ( $this->approvedDate ) {
 			$date = $this->approvedDate;
-			return new DITime(
-				DITime::CM_GREGORIAN,
+			return new Time(
+				Time::CM_GREGORIAN,
 				$date->format( 'Y' ),
 				$date->format( 'm' ),
 				$date->format( 'd' ),

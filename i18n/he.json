@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"A100Star",
 			"Amire80",
 			"ExampleTomer",
 			"Guycn2",
@@ -26,6 +27,8 @@
 	"sesp-property-page-img-desc": "\"$1\" רושם את תמונת הדף (לפי Extension:PageImages). זה מסופק על־ידי ההרחבה [https://www.semantic-mediawiki.org/wiki/Extension:Semantic_Extra_Special_Properties Semantic Extra Special Properties].",
 	"sesp-property-view-count": "מספר הצפיות בדף",
 	"sesp-property-view-count-desc": "\"$1\" רושם את מספר הצפיות בדף. זה מסופק על־ידי ההרחבה [https://www.semantic-mediawiki.org/wiki/Extension:Semantic_Extra_Special_Properties Semantic Extra Special Properties].",
+	"sesp-property-description": "תיאור הדף",
+	"sesp-property-description-desc": "המאפיין \"$1\" מתעד את תיאור הדף, כפי שהוא נשמר במאפיין הדף \"description\" באמצעות הרחבות למטא־תיאורים, כגון Description2 או WikiSEO. התיאור נקרא ללא תלות בהרחבה שהגדירה אותו. המאפיין מסופק על ידי ההרחבה [https://www.semantic-mediawiki.org/wiki/Extension:Semantic_Extra_Special_Properties Semantic Extra Special Properties].",
 	"sesp-property-subpages": "דפי משנה",
 	"sesp-property-subpages-desc": "\"$1\" רושם את כל דפי־המשנה של דף. זה מסופק על־ידי ההרחבה [https://www.semantic-mediawiki.org/wiki/Extension:Semantic_Extra_Special_Properties Semantic Extra Special Properties].",
 	"sesp-property-revisions": "מספר הגרסאות",
@@ -72,6 +75,16 @@
 	"sesp-exif-gpsaltitude": "Exif:גובה",
 	"sesp-exif-label": "Exif:תווית",
 	"sesp-exif-iimcategory": "Exit:קטגוריית Iim",
+	"sesp-property-group-label-user-data-group": "קשור למשתמש",
+	"sesp-property-group-label-page-data-group": "קשור לדף",
+	"sesp-property-group-label-exif-dimension-group": "Exif (ממד ורזולוציה)",
+	"sesp-property-group-label-exif-meta-group": "Exif (מנהלי)",
+	"sesp-property-group-label-exif-classification-group": "Exif (סיווג)",
+	"sesp-property-group-label-exif-camera-lense-settings-group": "Exif (מצלמה ועדשה)",
+	"sesp-property-group-label-exif-exposure-group": "Exif (חשיפה)",
+	"sesp-property-group-label-exif-scene-group": "Exif (סצנה)",
+	"sesp-property-group-label-exif-location-group": "Exif (מיקום)",
+	"sesp-property-group-label-exif-gps-group": "Exif (מקום, GPS)",
 	"sesp-admin-deprecation-notice-section": "ההרחבה Semantic Extra Special Properties",
 	"sesp-admin-deprecation-notice-title-replacement": "הגדרות שהוחלפו או ששמן שונה",
 	"sesp-admin-deprecation-notice-title-replacement-explanation": "הפרק הבא מכיל הגדרות ששמן שונה או ששונו בדרך אחרת ומומלץ לעדכן לאלתר את השם או את התסדיר שלהן.",

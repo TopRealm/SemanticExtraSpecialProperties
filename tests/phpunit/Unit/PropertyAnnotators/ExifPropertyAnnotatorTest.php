@@ -2,10 +2,16 @@
 
 namespace SESP\Tests\PropertyAnnotators;
 
+use File;
+use MediaWiki\Title\Title;
+use SESP\AppFactory;
+use SESP\LabelFetcher;
 use SESP\PropertyAnnotators\ExifPropertyAnnotator;
 use SESP\PropertyDefinitions;
-use SMW\DIProperty;
-use SMW\DIWikiPage;
+use SMW\DataItems\Property;
+use SMW\DataItems\WikiPage;
+use SMW\DataModel\SemanticData;
+use WikiFilePage;
 
 /**
  * @covers \SESP\PropertyAnnotators\ExifPropertyAnnotator
@@ -24,11 +30,11 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->appFactory = $this->getMockBuilder( '\SESP\AppFactory' )
+		$this->appFactory = $this->getMockBuilder( AppFactory::class )
 			->disableOriginalConstructor()
 			->getMock();
 
-		$this->property = new DIProperty( '___EXIFDATA' );
+		$this->property = new Property( '___EXIFDATA' );
 	}
 
 	public function testCanConstruct() {
@@ -49,7 +55,7 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 	}
 
 	public function testTryAddAnnotationForNonExistingFile() {
-		$file = $this->getMockBuilder( 'File' )
+		$file = $this->getMockBuilder( File::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -57,7 +63,7 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			->method( 'exists' )
 			->willReturn( false );
 
-		$wikiPage = $this->getMockBuilder( '\WikiFilePage' )
+		$wikiPage = $this->getMockBuilder( WikiFilePage::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -65,7 +71,7 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			->method( 'getFile' )
 			->willReturn( $file );
 
-		$title = $this->getMockBuilder( '\Title' )
+		$title = $this->getMockBuilder( Title::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -73,7 +79,7 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			->method( 'inNamespace' )
 			->willReturn( true );
 
-		$subject = $this->getMockBuilder( '\SMW\DIWikiPage' )
+		$subject = $this->getMockBuilder( WikiPage::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -85,7 +91,7 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			->method( 'newWikiPage' )
 			->willReturn( $wikiPage );
 
-		$semanticData = $this->getMockBuilder( '\SMW\SemanticData' )
+		$semanticData = $this->getMockBuilder( SemanticData::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -104,7 +110,7 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 	 * @dataProvider metaProvider
 	 */
 	public function testAddAnnotation( $meta, $defs, $expected ) {
-		$labelFetcher = $this->getMockBuilder( '\SESP\LabelFetcher' )
+		$labelFetcher = $this->getMockBuilder( LabelFetcher::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -116,9 +122,9 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			$defs
 		);
 
-		$subject = DIWikiPage::newFromText( __METHOD__, NS_FILE );
+		$subject = WikiPage::newFromText( __METHOD__, NS_FILE );
 
-		$file = $this->getMockBuilder( 'File' )
+		$file = $this->getMockBuilder( File::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -130,7 +136,7 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			->method( 'getMetadata' )
 			->willReturn( serialize( $meta ) );
 
-		$wikiPage = $this->getMockBuilder( '\WikiFilePage' )
+		$wikiPage = $this->getMockBuilder( WikiFilePage::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -146,7 +152,7 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 			->method( 'getPropertyDefinitions' )
 			->willReturn( $propertyDefinitions );
 
-		$semanticData = $this->getMockBuilder( '\SMW\SemanticData' )
+		$semanticData = $this->getMockBuilder( SemanticData::class )
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -210,6 +216,20 @@ class ExifPropertyAnnotatorTest extends \PHPUnit\Framework\TestCase {
 		$provider['unmatchable'] = [
 			[ 'Foo' => 'ABC' ],
 			[ '_EXIF' => [ 'Foo' => [ 'id' => 'Foo', 'type' => '_txt' ] ] ],
+			$this->never()
+		];
+
+		// #226
+		$provider['multivalue-dc-date'] = [
+			[ 'dc-date' => [ 0 => '2025:11:03 21:27:42', '_type' => 'ol' ] ],
+			[ '_EXIF' => [ 'DC-DATE' => [ 'id' => 'Foo', 'type' => '_dat' ] ] ],
+			$this->once()
+		];
+
+		// #226 - empty once _type is dropped: no annotation, no fatal
+		$provider['multivalue-empty'] = [
+			[ 'dc-date' => [ '_type' => 'ol' ] ],
+			[ '_EXIF' => [ 'DC-DATE' => [ 'id' => 'Foo', 'type' => '_dat' ] ] ],
 			$this->never()
 		];
 

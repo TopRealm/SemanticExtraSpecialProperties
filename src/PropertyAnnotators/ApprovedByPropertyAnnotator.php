@@ -3,13 +3,14 @@
 namespace SESP\PropertyAnnotators;
 
 use ApprovedRevs;
+use MediaWiki\Title\Title;
+use MediaWiki\User\User;
+use MediaWiki\User\UserIdentity;
 use SESP\AppFactory;
 use SESP\PropertyAnnotator;
-use SMW\DIProperty;
-use SMW\DIWikiPage;
-use SMW\SemanticData;
-use Title;
-use User;
+use SMW\DataItems\Property;
+use SMW\DataItems\WikiPage;
+use SMW\DataModel\SemanticData;
 
 /**
  * @private
@@ -30,7 +31,7 @@ class ApprovedByPropertyAnnotator implements PropertyAnnotator {
 	private $appFactory;
 
 	/**
-	 * @var int|null
+	 * @var UserIdentity|false|null
 	 */
 	private $approvedBy;
 
@@ -44,7 +45,7 @@ class ApprovedByPropertyAnnotator implements PropertyAnnotator {
 	/**
 	 * @since 2.0
 	 *
-	 * @param User $approvedBy
+	 * @param UserIdentity|false|null $approvedBy
 	 */
 	public function setApprovedBy( $approvedBy ) {
 		$this->approvedBy = $approvedBy;
@@ -53,14 +54,14 @@ class ApprovedByPropertyAnnotator implements PropertyAnnotator {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isAnnotatorFor( DIProperty $property ) {
+	public function isAnnotatorFor( Property $property ) {
 		return $property->getKey() === self::PROP_ID;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function addAnnotation( DIProperty $property, SemanticData $semanticData ) {
+	public function addAnnotation( Property $property, SemanticData $semanticData ) {
 		if ( $this->approvedBy === null && class_exists( 'ApprovedRevs' ) ) {
 			$title = $semanticData->getSubject()->getTitle();
 			if ( ApprovedRevs::pageIsApprovable( $title ) ) {
@@ -78,11 +79,18 @@ class ApprovedByPropertyAnnotator implements PropertyAnnotator {
 	}
 
 	private function getDataItem() {
-		if ( $this->approvedBy instanceof User ) {
-			$userPage = $this->approvedBy->getUserPage();
+		$approver = $this->approvedBy;
+
+		// ApprovedRevs declares the approver as a UserIdentity, which is not necessarily a User.
+		if ( $approver instanceof UserIdentity && !$approver instanceof User ) {
+			$approver = User::newFromIdentity( $approver );
+		}
+
+		if ( $approver instanceof User ) {
+			$userPage = $approver->getUserPage();
 
 			if ( $userPage instanceof Title ) {
-				return DIWikiPage::newFromTitle( $userPage );
+				return WikiPage::newFromTitle( $userPage );
 			}
 		}
 	}

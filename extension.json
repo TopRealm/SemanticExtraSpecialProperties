@@ -1,6 +1,6 @@
 {
 	"name": "SemanticExtraSpecialProperties",
-	"version": "3.0.5",
+	"version": "5.0.2",
 	"author": [
 		"Leo Wallentin",
         "James Hong Kong",
@@ -13,9 +13,9 @@
 	"license-name": "GPL-2.0-or-later",
 	"type": "semantic",
 	"requires": {
-		"MediaWiki": ">= 1.35",
+		"MediaWiki": ">= 1.43",
 		"extensions": {
-			"SemanticMediaWiki": "*"
+			"SemanticMediaWiki": ">= 7.0"
 		}
 	},
 	"MessagesDirs": {
@@ -23,9 +23,12 @@
 			"i18n"
 		]
 	},
-	"callback": "SESP\\Hook::callback",
 	"AutoloadNamespaces": {
 		"SESP\\": "src/"
+	},
+	"TestAutoloadNamespaces": {
+		"SESP\\Tests\\": "tests/phpunit/Unit/",
+		"SESP\\Tests\\Integration\\": "tests/phpunit/Integration/"
 	},
 	"ConfigRegistry": {
 		"sespg": "SESP\\Config::newInstance"
@@ -75,9 +78,34 @@
 			"descriptionmsg": "sesp-config-links-to-enabled-namespaces"
 		}
 	},
-	"Hooks": {
-		"SetupAfterCache": "SESP\\Hook::onSetupAfterCache"
+	"ServiceWiringFiles": [
+		"src/ServiceWiring.php"
+	],
+	"HookHandlers": {
+		"PropertyHooks": {
+			"class": "SESP\\Hooks\\PropertyHooks",
+			"services": [
+				"SESP.PropertyRegistry",
+				"SESP.ExtraPropertyAnnotator"
+			]
+		},
+		"ApprovedRevsHooks": {
+			"class": "SESP\\Hooks\\ApprovedRevsHooks",
+			"services": [
+				"SESP.ObjectCache"
+			]
+		},
+		"ConfigHooks": {
+			"class": "SESP\\Hooks\\ConfigHooks"
+		}
 	},
-	"load_composer_autoloader": true,
+	"Hooks": {
+		"SMW::Property::initProperties": "PropertyHooks",
+		"SMW::SQLStore::AddCustomFixedPropertyTables": "PropertyHooks",
+		"SMW::Store::BeforeDataUpdateComplete": "PropertyHooks",
+		"ApprovedRevsRevisionApproved": "ApprovedRevsHooks",
+		"ApprovedRevsRevisionUnapproved": "ApprovedRevsHooks",
+		"SMW::Settings::BeforeInitializationComplete": "ConfigHooks"
+	},
 	"manifest_version": 2
 }

@@ -2,13 +2,12 @@
 
 namespace SESP\Tests;
 
+use MediaWiki\Title\Title;
+use MediaWiki\User\User;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use SESP\AppFactory;
 use SESP\PropertyDefinitions;
-use Title;
-use User;
-use WikiFilePage;
 use Wikimedia\Rdbms\Database;
 use WikiPage;
 
@@ -47,17 +46,6 @@ class AppFactoryTest extends \PHPUnit\Framework\TestCase {
 		);
 	}
 
-	public function testCanConstructWikiPageFrom_NS_MEDIA() {
-		$title = Title::newFromText( 'Foo', NS_MEDIA );
-
-		$instance = new AppFactory();
-
-		$this->assertInstanceOf(
-			WikiFilePage::class,
-			$instance->newWikiPage( $title )
-		);
-	}
-
 	public function testCanConstructUserFromTitle() {
 		$title = $this->getMockBuilder( Title::class )
 			->disableOriginalConstructor()
@@ -81,6 +69,16 @@ class AppFactoryTest extends \PHPUnit\Framework\TestCase {
 		$this->assertInstanceOf(
 			User::class,
 			$instance->newUserFromID( 42 )
+		);
+	}
+
+	public function testGetPagePropertyReturnsNullForUnknownPage() {
+		$title = Title::newFromText( 'SESP-getPageProperty-unknown-page' );
+
+		$instance = new AppFactory();
+
+		$this->assertNull(
+			$instance->getPageProperty( $title, 'description' )
 		);
 	}
 
@@ -157,17 +155,5 @@ class AppFactoryTest extends \PHPUnit\Framework\TestCase {
 			'Bar',
 			$instance->getOption( 'Foo' )
 		);
-	}
-
-	public function testNewDatabaseLogReader() {
-		$connection = $this->getMockBuilder( Database::class )
-			->disableOriginalConstructor()
-			->getMock();
-
-		$appFactory = new AppFactory();
-		$appFactory->setConnection( $connection );
-
-		$dbLogReader = $appFactory->newDatabaseLogReader( null );
-		$this->assertNull( $dbLogReader->getStatusOfLogEntry() );
 	}
 }

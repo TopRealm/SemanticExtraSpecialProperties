@@ -3,12 +3,12 @@
 namespace SESP\PropertyAnnotators;
 
 use ApprovedRevs;
-use IDBAccessObject;
 use SESP\AppFactory;
 use SESP\PropertyAnnotator;
-use SMW\DIProperty;
-use SMW\SemanticData;
-use SMWDIString as DIString;
+use SMW\DataItems\Blob as DIString;
+use SMW\DataItems\Property;
+use SMW\DataModel\SemanticData;
+use Wikimedia\Rdbms\IDBAccessObject;
 
 /**
  * @private
@@ -29,7 +29,7 @@ class ApprovedStatusPropertyAnnotator implements PropertyAnnotator {
 	private $appFactory;
 
 	/**
-	 * @var int|null
+	 * @var string|false|null
 	 */
 	private $approvedStatus;
 
@@ -43,7 +43,7 @@ class ApprovedStatusPropertyAnnotator implements PropertyAnnotator {
 	/**
 	 * @since 2.0
 	 *
-	 * @param string $approvedStatus
+	 * @param string|false|null $approvedStatus
 	 */
 	public function setApprovedStatus( $approvedStatus ) {
 		$this->approvedStatus = $approvedStatus;
@@ -52,14 +52,14 @@ class ApprovedStatusPropertyAnnotator implements PropertyAnnotator {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isAnnotatorFor( DIProperty $property ) {
+	public function isAnnotatorFor( Property $property ) {
 		return $property->getKey() === self::PROP_ID;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function addAnnotation( DIProperty $property, SemanticData $semanticData ) {
+	public function addAnnotation( Property $property, SemanticData $semanticData ) {
 		if ( $this->approvedStatus === null && class_exists( 'ApprovedRevs' ) ) {
 			$title = $semanticData->getSubject()->getTitle();
 			if ( ApprovedRevs::pageIsApprovable( $title ) ) {

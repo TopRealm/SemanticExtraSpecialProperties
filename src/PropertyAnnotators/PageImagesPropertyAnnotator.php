@@ -3,12 +3,13 @@
 namespace SESP\PropertyAnnotators;
 
 use File;
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Title\Title;
 use SESP\AppFactory;
 use SESP\PropertyAnnotator;
-use SMW\DIProperty;
-use SMW\DIWikiPage;
-use SMW\SemanticData;
-use Title;
+use SMW\DataItems\Property;
+use SMW\DataItems\WikiPage;
+use SMW\DataModel\SemanticData;
 
 class PageImagesPropertyAnnotator implements PropertyAnnotator {
 
@@ -36,7 +37,7 @@ class PageImagesPropertyAnnotator implements PropertyAnnotator {
 	 *
 	 * {@inheritDoc}
 	 */
-	public function isAnnotatorFor( DIProperty $property ) {
+	public function isAnnotatorFor( Property $property ) {
 		return $property->getKey() === self::PROP_ID;
 	}
 
@@ -45,12 +46,12 @@ class PageImagesPropertyAnnotator implements PropertyAnnotator {
 	 *
 	 * {@inheritDoc}
 	 */
-	public function addAnnotation( DIProperty $property, SemanticData $semanticData ) {
+	public function addAnnotation( Property $property, SemanticData $semanticData ) {
 		$Title = $semanticData->getSubject()->getTitle();
 		$pageImageTitle = $this->getPageImageTitle( $Title );
 
 		if ( $pageImageTitle ) {
-			$semanticData->addPropertyObjectValue( $property, DIWikiPage::newFromTitle( $pageImageTitle ) );
+			$semanticData->addPropertyObjectValue( $property, WikiPage::newFromTitle( $pageImageTitle ) );
 		}
 	}
 
@@ -76,9 +77,24 @@ class PageImagesPropertyAnnotator implements PropertyAnnotator {
 	 * @return File|bool
 	 */
 	protected function getPageImage( Title $Title ) {
-		if ( class_exists( '\PageImages\PageImages' ) ) {
+		if ( !class_exists( '\PageImages\PageImages' ) ) {
+			return false;
+		}
+
+		// MW 1.44+ registers a PageImages service. The static
+		// PageImages::getPageImage() was deprecated in MW 1.45 and removed in
+		// MW 1.46, so prefer the service wherever it is available.
+		$services = MediaWikiServices::getInstance();
+
+		if ( $services->hasService( 'PageImages.PageImages' ) ) {
+			return $services->getService( 'PageImages.PageImages' )->getImage( $Title ) ?? false;
+		}
+
+		// MW 1.43 only provides the static method.
+		if ( method_exists( '\PageImages\PageImages', 'getPageImage' ) ) {
 			return \PageImages\PageImages::getPageImage( $Title );
 		}
+
 		return false;
 	}
 }

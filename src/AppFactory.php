@@ -3,13 +3,13 @@
 namespace SESP;
 
 use MediaWiki\MediaWikiServices;
-use Onoi\Cache\Cache;
+use MediaWiki\Title\Title;
+use MediaWiki\User\User;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Title;
-use User;
-use Wikimedia\Rdbms\Database;
+use Wikimedia\ObjectCache\BagOStuff;
+use Wikimedia\Rdbms\IReadableDatabase;
 use WikiPage;
 
 /**
@@ -28,12 +28,12 @@ class AppFactory implements LoggerAwareInterface {
 	private $options;
 
 	/**
-	 * @var Cache
+	 * @var BagOStuff
 	 */
 	private $cache;
 
 	/**
-	 * @var array
+	 * @var IReadableDatabase|null
 	 */
 	private $connection;
 
@@ -51,9 +51,9 @@ class AppFactory implements LoggerAwareInterface {
 	 * @since 2.0
 	 *
 	 * @param array $options
-	 * @param Cache|null $cache
+	 * @param BagOStuff|null $cache
 	 */
-	public function __construct( array $options = [], Cache $cache = null ) {
+	public function __construct( array $options = [], ?BagOStuff $cache = null ) {
 		$this->options = $options;
 		$this->cache = $cache;
 	}
@@ -61,18 +61,18 @@ class AppFactory implements LoggerAwareInterface {
 	/**
 	 * @since 2.0
 	 */
-	public function setConnection( Database $connection ) {
+	public function setConnection( IReadableDatabase $connection ) {
 		$this->connection = $connection;
 	}
 
 	/**
 	 * @since 1.3
 	 *
-	 * @return Database
+	 * @return IReadableDatabase
 	 */
 	public function getConnection() {
 		if ( $this->connection === null ) {
-			$this->connection = wfGetDB( DB_REPLICA );
+			$this->connection = MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase();
 		}
 
 		return $this->connection;
@@ -85,7 +85,7 @@ class AppFactory implements LoggerAwareInterface {
 	 *
 	 * @param LoggerInterface $logger
 	 */
-	public function setLogger( LoggerInterface $logger ) {
+	public function setLogger( LoggerInterface $logger ): void {
 		$this->logger = $logger;
 	}
 
@@ -157,24 +157,29 @@ class AppFactory implements LoggerAwareInterface {
 	 * @return WikiPage
 	 */
 	public function newWikiPage( Title $title ) {
-		// #55
-		// Fight a possible DB corruption and avoid "NS_MEDIA is a virtual namespace; use NS_FILE"
-		if ( $title->getNamespace() === NS_MEDIA ) {
-			$title = Title::makeTitleSafe(
-				NS_FILE,
-				$title->getDBkey(),
-				$title->getInterwiki(),
-				$title->getFragment()
-			);
+		$services = MediaWikiServices::getInstance();
+		return $services->getWikiPageFactory()->newFromTitle( $title );
+	}
+
+	/**
+	 * Reads a single page property as persisted in the `page_props` table (for
+	 * example the `description` set by the Description2 extension).
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param Title $title
+	 * @param string $name
+	 *
+	 * @return string|null the property value, or null when it is not set
+	 */
+	public function getPageProperty( Title $title, string $name ): ?string {
+		$properties = MediaWikiServices::getInstance()->getPageProps()->getProperties( $title, $name );
+
+		if ( $properties === [] ) {
+			return null;
 		}
 
-		// Pre 1.36
-		$services = MediaWikiServices::getInstance();
-		if ( !method_exists( $services, 'getWikiPageFactory' ) ) {
-			return WikiPage::factory( $title );
-		} else {
-			return $services->getWikiPageFactory()->newFromTitle( $title );
-		}
+		return (string)reset( $properties );
 	}
 
 	/**
@@ -197,16 +202,5 @@ class AppFactory implements LoggerAwareInterface {
 	 */
 	public function newUserFromID( $id ) {
 		return User::newFromId( $id );
-	}
-
-	/**
-	 * @since 2.0
-	 *
-	 * @param null|Title $title to get the DBLogReader
-	 * @param string $type which log entries to get (default: approval)
-	 * @return DatabaseLogReader
-	 */
-	public function newDatabaseLogReader( Title $title = null, $type = 'approval' ) {
-		return new DatabaseLogReader( $this->getConnection(), $title, $type );
 	}
 }
