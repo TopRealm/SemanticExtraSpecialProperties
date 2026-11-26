@@ -5,6 +5,7 @@ namespace SESP\PropertyAnnotators;
 use ApprovedRevs;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
+use MediaWiki\User\UserIdentity;
 use SESP\AppFactory;
 use SESP\PropertyAnnotator;
 use SMW\DataItems\Property;
@@ -30,7 +31,7 @@ class ApprovedByPropertyAnnotator implements PropertyAnnotator {
 	private $appFactory;
 
 	/**
-	 * @var int|null
+	 * @var UserIdentity|false|null
 	 */
 	private $approvedBy;
 
@@ -44,7 +45,7 @@ class ApprovedByPropertyAnnotator implements PropertyAnnotator {
 	/**
 	 * @since 2.0
 	 *
-	 * @param User $approvedBy
+	 * @param UserIdentity|false|null $approvedBy
 	 */
 	public function setApprovedBy( $approvedBy ) {
 		$this->approvedBy = $approvedBy;
@@ -78,8 +79,15 @@ class ApprovedByPropertyAnnotator implements PropertyAnnotator {
 	}
 
 	private function getDataItem() {
-		if ( $this->approvedBy instanceof User ) {
-			$userPage = $this->approvedBy->getUserPage();
+		$approver = $this->approvedBy;
+
+		// ApprovedRevs declares the approver as a UserIdentity, which is not necessarily a User.
+		if ( $approver instanceof UserIdentity && !$approver instanceof User ) {
+			$approver = User::newFromIdentity( $approver );
+		}
+
+		if ( $approver instanceof User ) {
+			$userPage = $approver->getUserPage();
 
 			if ( $userPage instanceof Title ) {
 				return WikiPage::newFromTitle( $userPage );

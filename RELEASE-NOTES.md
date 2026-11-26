@@ -1,5 +1,16 @@
 This file contains the RELEASE-NOTES of the **Semantic Extra Special Properties** (a.k.a. SESP) extension.
 
+### 5.1.0
+
+Released on TBD.
+
+* Fixed a fatal error in the `Short URL` property when `$wgShortUrlPrefix` is empty and the ShortUrl extension is installed.
+* Fixed enabled properties being skipped when they were looked up before the property definitions had been read from the definitions file; the definitions are now loaded on first use.
+* Fixed the `Approved by` property being dropped when ApprovedRevs reports the approver as a user identity that is not a `User` object, as its API allows.
+* The minimum required PHP version is now 8.2 (previously 8.1).
+* Removed the unused `SESP\DatabaseLogReader` class and `AppFactory::newDatabaseLogReader()`; no property annotator has used them since 2023.
+* Localization updates from https://translatewiki.net
+
 ### 5.0.2
 
 Released on September 1, 2026.

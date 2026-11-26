@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"A100Star",
 			"Amire80",
 			"ExampleTomer",
 			"Guycn2",
@@ -27,6 +28,7 @@
 	"sesp-property-view-count": "מספר הצפיות בדף",
 	"sesp-property-view-count-desc": "\"$1\" רושם את מספר הצפיות בדף. זה מסופק על־ידי ההרחבה [https://www.semantic-mediawiki.org/wiki/Extension:Semantic_Extra_Special_Properties Semantic Extra Special Properties].",
 	"sesp-property-description": "תיאור הדף",
+	"sesp-property-description-desc": "המאפיין \"$1\" מתעד את תיאור הדף, כפי שהוא נשמר במאפיין הדף \"description\" באמצעות הרחבות למטא־תיאורים, כגון Description2 או WikiSEO. התיאור נקרא ללא תלות בהרחבה שהגדירה אותו. המאפיין מסופק על ידי ההרחבה [https://www.semantic-mediawiki.org/wiki/Extension:Semantic_Extra_Special_Properties Semantic Extra Special Properties].",
 	"sesp-property-subpages": "דפי משנה",
 	"sesp-property-subpages-desc": "\"$1\" רושם את כל דפי־המשנה של דף. זה מסופק על־ידי ההרחבה [https://www.semantic-mediawiki.org/wiki/Extension:Semantic_Extra_Special_Properties Semantic Extra Special Properties].",
 	"sesp-property-revisions": "מספר הגרסאות",

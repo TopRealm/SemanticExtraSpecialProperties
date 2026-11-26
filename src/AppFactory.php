@@ -9,7 +9,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Wikimedia\ObjectCache\BagOStuff;
-use Wikimedia\Rdbms\Database;
+use Wikimedia\Rdbms\IReadableDatabase;
 use WikiPage;
 
 /**
@@ -33,7 +33,7 @@ class AppFactory implements LoggerAwareInterface {
 	private $cache;
 
 	/**
-	 * @var array
+	 * @var IReadableDatabase|null
 	 */
 	private $connection;
 
@@ -61,14 +61,14 @@ class AppFactory implements LoggerAwareInterface {
 	/**
 	 * @since 2.0
 	 */
-	public function setConnection( Database $connection ) {
+	public function setConnection( IReadableDatabase $connection ) {
 		$this->connection = $connection;
 	}
 
 	/**
 	 * @since 1.3
 	 *
-	 * @return Database
+	 * @return IReadableDatabase
 	 */
 	public function getConnection() {
 		if ( $this->connection === null ) {
@@ -202,16 +202,5 @@ class AppFactory implements LoggerAwareInterface {
 	 */
 	public function newUserFromID( $id ) {
 		return User::newFromId( $id );
-	}
-
-	/**
-	 * @since 2.0
-	 *
-	 * @param null|Title $title to get the DBLogReader
-	 * @param string $type which log entries to get (default: approval)
-	 * @return DatabaseLogReader
-	 */
-	public function newDatabaseLogReader( ?Title $title = null, $type = 'approval' ) {
-		return new DatabaseLogReader( $this->getConnection(), $title, $type );
 	}
 }

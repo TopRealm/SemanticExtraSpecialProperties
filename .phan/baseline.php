@@ -1,0 +1,87 @@
+<?php
+/**
+ * This is an automatically generated baseline for Phan issues.
+ * When Phan is invoked with --load-baseline=path/to/baseline.php,
+ * The pre-existing issues listed in this file won't be emitted.
+ *
+ * This file can be updated by invoking Phan with --save-baseline=path/to/baseline.php
+ * (can be combined with --load-baseline)
+ */
+return [
+	// # Issue statistics:
+	// PhanTypeMismatchArgumentNullable : 15+ occurrences
+	// PhanUndeclaredClassMethod : 3 occurrences
+	// PhanUndeclaredMethod : 2 occurrences
+	// MediaWikiNoEmptyIfDefined : 1 occurrence
+	// PhanRedundantCondition : 1 occurrence
+	// PhanTypeMismatchProperty : 1 occurrence
+	// PhanUnusedVariableCaughtException : 1 occurrence
+
+	'file_suppressions' => [
+		'src/PropertyAnnotators/ApprovedByPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\ApprovedByPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/ApprovedStatusPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\ApprovedStatusPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/CreatorPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\CreatorPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/DispatchingPropertyAnnotator.php' => [
+			'PhanTypeMismatchProperty' => ['\\SESP\\PropertyAnnotators\\DispatchingPropertyAnnotator::initDefaultPropertyAnnotators']
+		],
+		'src/PropertyAnnotators/ExifPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\ExifPropertyAnnotator::addAnnotation'],
+			'PhanUndeclaredMethod' => ['\\SESP\\PropertyAnnotators\\ExifPropertyAnnotator::addAnnotation'],
+			'PhanUnusedVariableCaughtException' => ['\\SESP\\PropertyAnnotators\\ExifPropertyAnnotator::makeDataItemTime']
+		],
+		'src/PropertyAnnotators/LinksToPropertyAnnotator.php' => [
+			'MediaWikiNoEmptyIfDefined' => ['\\SESP\\PropertyAnnotators\\LinksToPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/PageContributorsPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\PageContributorsPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/PageDescriptionPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\PageDescriptionPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/PageIDPropertyAnnotator.php' => [
+			'PhanRedundantCondition' => ['\\SESP\\PropertyAnnotators\\PageIDPropertyAnnotator::addAnnotation'],
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\PageIDPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/PageImagesPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\PageImagesPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/PageViewsPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\PageViewsPropertyAnnotator::addAnnotation'],
+			'PhanUndeclaredClassMethod' => ['\\SESP\\PropertyAnnotators\\PageViewsPropertyAnnotator::getPageViewCount'],
+			'PhanUndeclaredMethod' => ['\\SESP\\PropertyAnnotators\\PageViewsPropertyAnnotator::getPageViewCount']
+		],
+		'src/PropertyAnnotators/RevisionIDPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\RevisionIDPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/ShortUrlPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\ShortUrlPropertyAnnotator::addAnnotation'],
+			'PhanUndeclaredClassMethod' => ['\\SESP\\PropertyAnnotators\\ShortUrlPropertyAnnotator::getShortUrl']
+		],
+		'src/PropertyAnnotators/UserBlockPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\UserBlockPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/UserEditCountPerNsPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\UserEditCountPerNsPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/UserEditCountPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\UserEditCountPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/UserGroupPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\UserGroupPropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/UserRegistrationDatePropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\UserRegistrationDatePropertyAnnotator::addAnnotation']
+		],
+		'src/PropertyAnnotators/UserRightPropertyAnnotator.php' => [
+			'PhanTypeMismatchArgumentNullable' => ['\\SESP\\PropertyAnnotators\\UserRightPropertyAnnotator::addAnnotation']
+		],
+	],
+	// 'directory_suppressions' => ['src/directory_name' => ['PhanIssueName1', 'PhanIssueName2']] can be manually added if needed.
+	// (directory_suppressions will currently be ignored by subsequent calls to --save-baseline, but may be preserved in future Phan releases)
+];
